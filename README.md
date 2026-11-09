@@ -10,6 +10,7 @@ client plugin that renders ` ```mermaid ` code blocks in chat messages, with a
 
 - Mermaid v11 loaded on demand from a CDN (no bundle bloat).
 - Follows DSH dark/light theme automatically.
+- Viewport-gated rendering (IntersectionObserver) plus a sandboxed iframe worker so large `mermaid.render` work does not freeze the chat UI; SVG results are cached.
 - 500 ms debounce so streaming tokens don't thrash the renderer.
 - Native DSH code-block banner integration: buttons sit right next to the
   built-in **Copy** button; source view keeps Shiki highlight and copy.

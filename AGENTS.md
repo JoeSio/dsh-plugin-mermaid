@@ -16,10 +16,10 @@ Web/desktop client plugin: renders ` ```mermaid ` fences in DSH chat.
 |---|---|
 | `constants.js` | IDs, CDN URL, zoom/debounce, Mermaid keyword regex, CSS string |
 | `utils.js` | `hashString`, `clampZoom`, `currentTheme` |
-| `mermaid.js` | CDN load + `paintStage` |
+| `mermaid.js` | Sandboxed iframe worker + SVG cache + `paintStage` |
 | `detect.js` | Code-block DOM helpers and Mermaid detection |
 | `lightbox.js` | Fullscreen preview zoom/pan/fit |
-| `render.js` | Preview chrome, schedule/scan, DOM/theme observers |
+| `render.js` | Preview chrome, viewport-gated queue/scan, DOM/theme observers |
 | `styles.js` | Style tag injection |
 | `plugin.js` | `name` / `inject` / `apply` |
 | `entry.js` | Re-exports plugin public surface |
