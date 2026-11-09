@@ -13,8 +13,8 @@ client plugin that renders ` ```mermaid ` code blocks in chat messages, with a
 - 500 ms debounce so streaming tokens don't thrash the renderer.
 - Native DSH code-block banner integration: buttons sit right next to the
   built-in **Copy** button; source view keeps Shiki highlight and copy.
-- Zero build step — the browser entry is hand-written factory-form CJS exactly
-  as DSH's `client-modules` service expects.
+- Browser sources live under `lib/client/`; `npm run build:client` emits the
+  single ModuleLoader `lib/client.js` that DSH's `client-modules` service loads.
 
 ## Install
 
@@ -113,7 +113,8 @@ Mermaid theme.
 |---|---|
 | `package.json` | Declares `dsh.client.platform = "web"` and `./client` export. The `./package.json` subpath export is required because DSH resolves plugins via `require.resolve('<pkg>/package.json')`. |
 | `lib/index.js` | Host half (ESM, no-op). DSH's Cordis loader needs named `name`/`inject`/`apply` exports; it does nothing on the host because all work is browser-side. |
-| `lib/client.js` | Browser half: registers itself with `window.__ModuleLoader__.load({id, factory})`, injects styles, scans `.md-code-block` rows for `mermaid` infostrings, and installs a MutationObserver for streaming blocks. |
+| `lib/client/` | Browser half sources (constants, detect, lightbox, render, …). |
+| `lib/client.js` | Generated ModuleLoader bundle (`npm run build:client`): registers with `window.__ModuleLoader__.load({id, factory})`, injects styles, scans `.md-code-block` rows, and installs a MutationObserver for streaming blocks. |
 | `install.sh` | Copies the package into the web profile and patches `cordis.patch.yml`. |
 
 The plugin detects Mermaid blocks by reading DSH's banner `.infostring` text
@@ -126,13 +127,14 @@ falls back to `code[class*='language-mermaid']` for forward compatibility.
 - DSH `>= 0.1.0-rc.6` (tested on rc.6).
 - Network access to `cdn.jsdelivr.net` on first render (Mermaid is cached by
   the browser afterwards). To vendor it, change `MERMAID_CDN` in
-  `lib/client.js` to a local URL.
+  `lib/client/constants.js`, then run `npm run build:client`.
 
 ## Development
 
-The browser file is plain JavaScript; no build step. Edit `lib/client.js`, then:
+Edit modules under `lib/client/`, rebuild the ModuleLoader bundle, then re-sync:
 
 ```bash
+npm run build:client
 # Re-sync into the profile
 bash install.sh
 # Restart dsh web (DSH's client-hmr plugin is disabled in the default web
@@ -140,7 +142,7 @@ bash install.sh
 ```
 
 If you are running DSH from a source checkout with `pnpm run dev:web` and
-re-enable `client-hmr`, edits to `lib/client.js` hot-reload without restart.
+re-enable `client-hmr`, rebuild then let HMR pick up `lib/client.js`.
 
 ## Uninstall
 
